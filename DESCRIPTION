@@ -1,13 +1,13 @@
 Package: eumohpclipr
-Title: What the Package Does (One Line, Title Case)
+Title: Clipping the EU-MOHP data set to a selected country
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Maximilian",
+           family = "Nölscher",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "max-n@posteo.de",
+           comment = c(ORCID = " https://orcid.org/0000-0001-5606-1900"))
+Description: This package provides functionality for clipping the EU-MOHP data set to the administrative boundaries of a selected country. The administrative boundaries are based on the package rnaturalearth.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
