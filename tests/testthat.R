@@ -1,4 +1,4 @@
 library(testthat)
-library(r.example)
+library(eumohpclipr)
 
-test_check("r.example")
+test_check("eumohpclipr")
