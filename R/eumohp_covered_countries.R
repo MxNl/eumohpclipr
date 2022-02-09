@@ -1,0 +1,14 @@
+#' Administrative areas covered by EU-MOHP dataset
+#'
+#' A dataset containing geometries that are covered by the EU-MOHP dataset. These geometries reflect polygons defined by administrative boundaries of the EEA39 countries. To be consistent with the EU-MOHP coverage, the polygons do not include islands and oversea territories. EU-MOHP was calculated for the 10 area-wise largest contiguous land masses of the EEA39 countries. Therefore, Malta is also not included in this dataset. Cyprus is assigned to Greece, based on the package "rnaturalearthdata".
+#'
+#' @format Simple feature collection with 37 features (rows/ polygons) and 5 fields  (columns/ variables):
+#' \describe{
+#'   \item{name}{Country name, includes some abbreviations for long names}
+#'   \item{name_long}{Country name, without abbreviations}
+#'   \item{abbrev}{Abbreviation of English country names, abbreviated with a dot and inconsistent string length}
+#'   \item{postal}{Abbreviation of national country names, abbreviated with a all capital letters and inconsistent string length}
+#'   \item{su_a3}{Abbreviation of national country names, abbreviated with a all capital letters and a consistent string length of 3}
+#' }
+#' @source \url{https://cran.r-project.org/web/packages/rnaturalearth/README.html}
+"eumohp_covered_countries"
