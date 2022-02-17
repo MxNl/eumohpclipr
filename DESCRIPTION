@@ -12,16 +12,33 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports: 
     covr,
+    crayon,
+    dplyr,
     DT,
+    furrr,
+    glue,
+    here,
     htmltools,
     lintr,
+    patchwork,
+    purrr,
     renv,
+    sf,
+    stars,
+    stringr,
     styler,
     testthat
 Suggests: 
+    rnaturalearth,
     devtools,
-    usethis
+    usethis,
+    rnaturalearthdata,
+    ggplot2,
+    readr,
+    janitor
 Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
