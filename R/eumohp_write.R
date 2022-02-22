@@ -1,5 +1,15 @@
+#' Write the clipped EUMOHP data as raster data to GEOTIFF files
+#'
+#' @param eumohp_starsproxy A number.
+#' @param directory_output A number.
+#' @param parallel A number.
+#' @return ...
+#' @examples
+#' 1 + 1
 #' @export
-eumohp_write <- function(eumohp_starsproxy, directory_output, parallel = FALSE) {
+eumohp_write <- function(eumohp_starsproxy,
+                         directory_output,
+                         parallel = FALSE) {
   test <- FALSE
   if (test) {
     eumohp_starsproxy <- eumohp_starsproxy

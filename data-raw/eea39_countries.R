@@ -42,4 +42,4 @@ eea39_countries <-
     "United Kingdom"
   )
 
-usethis::use_data(eea39_countries, overwrite = TRUE)
+usethis::use_data(eea39_countries, overwrite = TRUE, internal = FALSE)

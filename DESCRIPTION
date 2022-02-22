@@ -26,6 +26,7 @@ Imports:
     patchwork,
     purrr,
     renv,
+    rlang,
     sf,
     stars,
     stringr,

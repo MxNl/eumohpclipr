@@ -7,4 +7,4 @@ filename_placeholders <- c(
   "spatial_resolution"
 )
 
-usethis::use_data(filename_placeholders, overwrite = TRUE)
+usethis::use_data(filename_placeholders, overwrite = TRUE, internal = TRUE)

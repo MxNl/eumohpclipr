@@ -1,6 +1,7 @@
 ^renv$
 ^renv\.lock$
 ^\.github$
+^\.githooks$
 ^LICENSE\.md$
 ^.idea$
 ^data-raw$
