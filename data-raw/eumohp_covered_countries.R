@@ -65,4 +65,7 @@ eumohp_covered_countries <- ne_countries(
   summarise(.groups = "drop") |>
   st_cast("MULTIPOLYGON")
 
-usethis::use_data(eumohp_covered_countries, overwrite = TRUE)
+eumohp_covered_countries |>
+  write_rds("inst/extdata/eumohp_covered_countries.Rds")
+
+# usethis::use_data(eumohp_covered_countries, overwrite = TRUE)

@@ -1,13 +1,18 @@
 .plot_single_order <- function(stars_object, name, downsample = 50) {
 
-  eumohp_measures <- filename_placeholders_values[names(filename_placeholders_values) == "abbreviation_measure"]
+  eumohp_measures <- filename_placeholders_values[
+    names(filename_placeholders_values) == "abbreviation_measure"]
   eumohp_measure <- name |> stringr::word(start = 2, sep = "_")
 
   if (eumohp_measure == eumohp_measures[2]) {
-    labels <- \(x) {x /1E4}
+    labels <- \ (x) {
+      x / 1E4
+      }
     unit_label <- "[ - ]"
   } else if (eumohp_measure %in% eumohp_measures[c(1, 3)]) {
-    labels <- \(x) {x /1E3}
+    labels <- \ (x) {
+      x / 1E3
+      }
     unit_label <- "[km]"
   }
 
@@ -43,24 +48,35 @@
         )
 }
 
+#' Plot the clipped EUMOHP data as grid
+#'
+#' @param .eumohp_starsproxy A list of stars proxy objects as derived
+#' from the function eumohp_clip().
+#' @param ... Additional arguments.
+#' @return ...
+#' @examples
+#' 1 + 1
 #' @export
-eumohp_plot <- function(eumohp_starsproxy, ...) {
+eumohp_plot <- function(.eumohp_starsproxy, ...) {
   test <- FALSE
   if (test) {
-    eumohp_starsproxy <- eumohp_starsproxy
+    .eumohp_starsproxy <- .eumohp_starsproxy
   }
-  args <- list(...)
 
-  eumohp_starsproxy |>
-    purrr::imap(~ .plot_single_order(.x, .y, args$downsample)) |>
+  .eumohp_starsproxy |>
+    purrr::imap(.plot_single_order, ...) |>
     patchwork::wrap_plots(nrow = 3) +
-    patchwork::plot_annotation(title = eumohp_starsproxy |>
-                                 names() |>
-                                 purrr::chuck(1) |>
-                                 stringr::word(start = 1, sep = "_") |>
-                                 {\(x) stringr::str_c("eumohp", x, sep = " - ")}() |>
-                                 stringr::str_to_title(),
-                               theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = .5,
-                                                                                         size = 12))
-                               )
+    patchwork::plot_annotation(
+      title = .eumohp_starsproxy |>
+        names() |>
+        purrr::chuck(1) |>
+        stringr::word(start = 1, sep = "_") |> {
+          \ (x) stringr::str_c("eumohp", x, sep = " - ")
+        }() |>
+        stringr::str_to_title(),
+      theme = ggplot2::theme(plot.title = ggplot2::element_text(
+        hjust = .5,
+        size = 12
+      ))
+    )
 }

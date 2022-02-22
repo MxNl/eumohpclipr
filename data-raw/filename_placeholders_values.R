@@ -19,4 +19,4 @@ filename_placeholders_values <-
   )) |>
   tibble::deframe()
 
-usethis::use_data(filename_placeholders_values, overwrite = TRUE)
+usethis::use_data(filename_placeholders_values, overwrite = TRUE, internal = TRUE)
