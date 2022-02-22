@@ -86,12 +86,19 @@ A list of stars_proxy objects with the user
 specified spatial extent / shape.
 }
 \description{
-Clip EUMOHP raster data to an arbitrary polygon
+Clips the EUMOHP raster data files as downloaded from the
+hydroshare data hosting platform. The files must be unzipped after
+the download. You can not only clip the files to a spatial extent,
+but you can also specify a selection of the data.
+This function works lazily through using the stars package.
+This means, that clipping and plotting
+(using eumohp_plot()) works really fast. Whereas writing the data
+(using eumohp_write()) is really slow.
 }
 \examples{
 \dontrun{
-Specifying the spatial extent of the clipped result
-via the argument: countries
+# Specifying the spatial extent of the clipped result
+# via the argument: countries
 eumohp_clip(
    directory_input = "directory/to/EUMOHPfiles/",
    countries = "germany",
@@ -100,8 +107,10 @@ eumohp_clip(
    abbreviation_measure = c("dsd", "lp"),
    eumohp_version = "v013.1.1"
 )
-Specifying the spatial extent of the clipped result
-via the argument: custom_sf_polygon
+
+
+# Specifying the spatial extent of the clipped result
+# via the argument: custom_sf_polygon
 eumohp_clip(
    directory_input = "directory/to/EUMOHPfiles/",
    custom_sf_polygon = .test_custom_sf_polygon() |> summarise(),
@@ -110,8 +119,10 @@ eumohp_clip(
    abbreviation_measure = c("dsd", "lp"),
    eumohp_version = "v013.1.1"
 )
-Specifying the spatial extent of the clipped result
-via the argument: region_name_spatcov
+
+
+# Specifying the spatial extent of the clipped result
+# via the argument: region_name_spatcov
 eumohp_clip(
    directory_input = "directory/to/EUMOHPfiles/",
    region_name_spatcov = c("france", "turkey", "italy2"),

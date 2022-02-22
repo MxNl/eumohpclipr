@@ -111,15 +111,8 @@
                     sep = "_")
 }
 .starsproxylist_as_mosaic <- function(starsproxylist) {
-  mosaic <- stars::st_mosaic(starsproxylist[[1]])
-
-  if (length(starsproxylist) > 1) {
-    for (i in 2:length(starsproxylist)) {
-      mosaic <-
-        stars::st_mosaic(mosaic, starsproxylist[[i]])
-    }
-  }
-  mosaic
+  starsproxylist |>
+    purrr::reduce(.f = stars::st_mosaic)
 }
 .read_starsproxy_aslist <- function(filepaths) {
   filepaths |>
@@ -129,11 +122,21 @@
   filepaths_subset <- filepaths_subset |>
     group_by(dplyr::across(dplyr::all_of(filename_placeholders[2:4])))
 
+  if (is.null(clip_layer)) {
+    spatial_prefix <- filepaths_subset |>
+      arrange(.data$region_name_spatcov) |>
+      dplyr::pull(.data$region_name_spatcov) |>
+      unique() |>
+      str_c(collapse = "-")
+  } else {
+    spatial_prefix <- clip_layer$name
+  }
+
   mosaic_names <- filepaths_subset |>
     summarise(.groups = "drop") |>
     tidyr::unite(mosaic_names) |>
     dplyr::pull(mosaic_names) |> {
-      \ (x) str_c(clip_layer$name, x, sep = "_")
+      \ (x) str_c(spatial_prefix, x, sep = "_")
     }()
 
   all_regions <- filepaths_subset |>
@@ -165,6 +168,15 @@
 
 
 #' Clip EUMOHP raster data to an arbitrary polygon
+#'
+#' Clips the EUMOHP raster data files as downloaded from the
+#' hydroshare data hosting platform. The files must be unzipped after
+#' the download. You can not only clip the files to a spatial extent,
+#' but you can also specify a selection of the data.
+#' This function works lazily through using the stars package.
+#' This means, that clipping and plotting
+#' (using eumohp_plot()) works really fast. Whereas writing the data
+#' (using eumohp_write()) is really slow.
 #'
 #' @param directory_input A string describing a directory
 #' where all the EUMOHP .tif files are located.
@@ -225,8 +237,8 @@
 #' specified spatial extent / shape.
 #' @examples
 #' \dontrun{
-#' Specifying the spatial extent of the clipped result
-#' via the argument: countries
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: countries
 #' eumohp_clip(
 #'    directory_input = "directory/to/EUMOHPfiles/",
 #'    countries = "germany",
@@ -235,8 +247,10 @@
 #'    abbreviation_measure = c("dsd", "lp"),
 #'    eumohp_version = "v013.1.1"
 #' )
-#' Specifying the spatial extent of the clipped result
-#' via the argument: custom_sf_polygon
+#'
+#'
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: custom_sf_polygon
 #' eumohp_clip(
 #'    directory_input = "directory/to/EUMOHPfiles/",
 #'    custom_sf_polygon = .test_custom_sf_polygon() |> summarise(),
@@ -245,8 +259,10 @@
 #'    abbreviation_measure = c("dsd", "lp"),
 #'    eumohp_version = "v013.1.1"
 #' )
-#' Specifying the spatial extent of the clipped result
-#' via the argument: region_name_spatcov
+#'
+#'
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: region_name_spatcov
 #' eumohp_clip(
 #'    directory_input = "directory/to/EUMOHPfiles/",
 #'    region_name_spatcov = c("france", "turkey", "italy2"),
@@ -318,6 +334,8 @@ eumohp_clip <- function(directory_input,
       !(.is_valid_placeholders_value(hydrologic_order) |>
         all())) {
     .generate_error_message(hydrologic_order)
+  } else if (!is.null(hydrologic_order)) {
+    hydrologic_order <- str_c(order_name, hydrologic_order)
   }
   if (!is.null(abbreviation_measure) &
       !(.is_valid_placeholders_value(abbreviation_measure) |>
@@ -364,17 +382,17 @@ eumohp_clip <- function(directory_input,
 
   if (is.numeric(buffer)) {
     clip_layer <- clip_layer |>
-      sf::st_buffer(dist = buffer)
+      sf::st_buffer(dist = buffer) |>
+      mutate(name = str_c(.data$name, "-b", buffer))
   }
 
   subset_specs <-
     as.list(environment()) |>
-    keep(.p = \ (x) {
-      names(x) %in% filename_placeholders |> any()
-    }) |>
-    .complete_subsetspecs() |>
-    .replace_order_extension(order_name)
+    magrittr::extract(filename_placeholders) |>
+    purrr::compact() |>
+    .complete_subsetspecs()
 
   filepaths_subset <- filepaths |> .subset_filepaths(subset_specs)
-  .read_and_clip_stars(filepaths_subset, clip_layer)
+  filepaths_subset |>
+    .read_and_clip_stars(clip_layer)
 }

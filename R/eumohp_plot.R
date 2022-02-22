@@ -2,6 +2,7 @@
 
   eumohp_measures <- filename_placeholders_values[
     names(filename_placeholders_values) == "abbreviation_measure"]
+  print(name)
   eumohp_measure <- name |> stringr::word(start = 2, sep = "_")
 
   if (eumohp_measure == eumohp_measures[2]) {
@@ -48,14 +49,37 @@
         )
 }
 
-#' Plot the clipped EUMOHP data as grid
+#' Plotting the clipped EUMOHP data
+#'
+#' Plots the clipped EUMOHP data as grid using ggplot2.
 #'
 #' @param .eumohp_starsproxy A list of stars proxy objects as derived
 #' from the function eumohp_clip().
 #' @param ... Additional arguments.
 #' @return ...
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' eumohp_clip(
+#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    region_name_spatcov = c("italy2"),
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' ) |>
+#' eumohp_plot()
+#'
+#'
+#' # If you want to plot faster, you can increase the argument downsample:
+#'
+#' eumohp_clip(
+#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    region_name_spatcov = c("italy2"),
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' ) |>
+#' eumohp_plot(downsample = 200)
+#' }
 #' @export
 eumohp_plot <- function(.eumohp_starsproxy, ...) {
   test <- FALSE
