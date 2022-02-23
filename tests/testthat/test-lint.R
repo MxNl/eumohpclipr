@@ -1,7 +1,6 @@
 if (requireNamespace("lintr", quietly = TRUE)) {
   library(lintr)
 
-  context("linting package")
   test_that("Package Style", {
 
     # A duplicate copy of the find_package function from lintr

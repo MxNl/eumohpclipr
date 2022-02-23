@@ -8,7 +8,7 @@ eumohp_clipped <- eumohp_clip(here::here("..",
                                          "output_data"),
   countries = c("germany", "poland"),
   hydrologic_order = 1:4,
-  abbreviation_measure = c("dsd","lp"),
+  abbreviation_measure = c("dsd", "lp"),
   # custom_sf_polygon = .test_custom_sf_polygon() |> dplyr::summarise(),
   buffer = 1E4,
   eumohp_version = "v013.1.1"
