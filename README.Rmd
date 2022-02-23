@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  github_document:
+    pandoc_args: --webtex
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -86,7 +88,7 @@ We can have a look at the length of the list `eumohp_clipped_countries`.
 ```{r}
 eumohp_clipped_countries |> length()
 ```
-In this case, `eumohp_clipped_countries` contains `r eumohp_clipped_countries |> length()` stars proxy objects because we requested 4 hydrologic orders (`hydrologic_order = 1:4`) and 2 measures (`abbreviation_measure = c("dsd", "lp")`). 2 * 4 = `r eumohp_clipped_countries |> length()`.
+In this case, `eumohp_clipped_countries` contains `r eumohp_clipped_countries |> length()` stars proxy objects because we requested 4 hydrologic orders (`hydrologic_order = 1:4`) and 2 measures (`abbreviation_measure = c("dsd", "lp")`). 4 * 2 = `r eumohp_clipped_countries |> length()`.
 
 But there are also other options to specify the area of interest.
 Specifying the spatial extent of the clipped result via the argument: `custom_sf_polygon`

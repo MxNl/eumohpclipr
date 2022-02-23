@@ -107,7 +107,7 @@ eumohp_clipped_countries |> length()
 
 In this case, `eumohp_clipped_countries` contains 8 stars proxy objects
 because we requested 4 hydrologic orders (`hydrologic_order = 1:4`) and
-2 measures (`abbreviation_measure = c("dsd", "lp")`). 2 \* 4 = 8.
+2 measures (`abbreviation_measure = c("dsd", "lp")`). 4 \* 2 = 8.
 
 But there are also other options to specify the area of interest.
 Specifying the spatial extent of the clipped result via the argument:
