@@ -49,9 +49,9 @@
         )
 }
 
-#' Plotting the clipped EUMOHP data
+#' Plotting the clipped EU-MOHP data
 #'
-#' Plots the clipped EUMOHP data as grid using ggplot2.
+#' Plots the clipped EU-MOHP data as grid using ggplot2.
 #'
 #' @param .eumohp_starsproxy A list of stars proxy objects as derived
 #' from the function eumohp_clip().
@@ -60,7 +60,7 @@
 #' @examples
 #' \dontrun{
 #' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    directory_input = "directory/to/EU-MOHPfiles/",
 #'    region_name_spatcov = c("italy2"),
 #'    hydrologic_order = 1:4,
 #'    abbreviation_measure = c("dsd", "lp"),
@@ -72,7 +72,7 @@
 #' # If you want to plot faster, you can increase the argument downsample:
 #'
 #' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    directory_input = "directory/to/EU-MOHPfiles/",
 #'    region_name_spatcov = c("italy2"),
 #'    hydrologic_order = 1:4,
 #'    abbreviation_measure = c("dsd", "lp"),

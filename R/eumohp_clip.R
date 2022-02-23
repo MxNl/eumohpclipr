@@ -167,9 +167,9 @@
 
 
 
-#' Clip EUMOHP raster data to an arbitrary polygon
+#' Clip EU-MOHP raster data to an arbitrary polygon
 #'
-#' Clips the EUMOHP raster data files as downloaded from the
+#' Clips the EU-MOHP raster data files as downloaded from the
 #' hydroshare data hosting platform. The files must be unzipped after
 #' the download. You can not only clip the files to a spatial extent,
 #' but you can also specify a selection of the data.
@@ -179,7 +179,7 @@
 #' (using eumohp_write()) is really slow.
 #'
 #' @param directory_input A string describing a directory
-#' where all the EUMOHP .tif files are located.
+#' where all the EU-MOHP .tif files are located.
 #' The provided directory will be searched recursively for files starting
 #' with 'eumohp_' file name prefix and a .tif ending.
 #' @param countries A character vector of arbitrary length.
@@ -188,7 +188,7 @@
 #' To see a list of these countries call 'eea39_countries' in the R console.
 #' If you provide this argument, you can specify
 #' the countries that should be clipped from
-#' the EUMOHP data set. The rnaturalearth boundaries
+#' the EU-MOHP data set. The rnaturalearth boundaries
 #' will be used as administrative
 #' boundaries for clipping.
 #' You can only provide on the following three arguments: countries,
@@ -204,9 +204,9 @@
 #' @param region_name_spatcov A character vector of arbitrary length.
 #' Each element of this vector should be a
 #' value of the placeholder region_name_spatcov
-#' according to the file naming scheme of the EUMOHP data set.
+#' according to the file naming scheme of the EU-MOHP data set.
 #' If you provide this argument, you can specify the .tif files
-#' of the EUMOHP data set that should be clipped
+#' of the EU-MOHP data set that should be clipped
 #' included in the clipped output of this function.
 #' You can only provide on the following three arguments: countries,
 #' custom_sf_polygon, region_name_spatcov.
@@ -224,7 +224,7 @@
 #' that you want to obtain in the clipped result of this function.
 #' The default is 30m. Currently, there is only a resolution of 30m available.
 #' @param eumohp_version A character vector of length 1.
-#' Via this argument you specify the EUMOHP version
+#' Via this argument you specify the EU-MOHP version
 #' that you are using / have downloaded.
 #' The default is v013.1.0.
 #' @param buffer A numeric vector of length 1 (optionally).
@@ -240,7 +240,7 @@
 #' # Specifying the spatial extent of the clipped result
 #' # via the argument: countries
 #' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    directory_input = "directory/to/EU-MOHPfiles/",
 #'    countries = "germany",
 #'    buffer = 1E4,
 #'    hydrologic_order = 1:4,
@@ -252,7 +252,7 @@
 #' # Specifying the spatial extent of the clipped result
 #' # via the argument: custom_sf_polygon
 #' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    directory_input = "directory/to/EU-MOHPfiles/",
 #'    custom_sf_polygon = .test_custom_sf_polygon() |> summarise(),
 #'    buffer = 1E4,
 #'    hydrologic_order = 1:4,
@@ -264,7 +264,7 @@
 #' # Specifying the spatial extent of the clipped result
 #' # via the argument: region_name_spatcov
 #' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
+#'    directory_input = "directory/to/EU-MOHPfiles/",
 #'    region_name_spatcov = c("france", "turkey", "italy2"),
 #'    hydrologic_order = 1:4,
 #'    abbreviation_measure = c("dsd", "lp"),

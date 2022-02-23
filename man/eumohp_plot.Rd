@@ -2,7 +2,7 @@
 % Please edit documentation in R/eumohp_plot.R
 \name{eumohp_plot}
 \alias{eumohp_plot}
-\title{Plotting the clipped EUMOHP data}
+\title{Plotting the clipped EU-MOHP data}
 \usage{
 eumohp_plot(.eumohp_starsproxy, ...)
 }
@@ -16,12 +16,12 @@ from the function eumohp_clip().}
 ...
 }
 \description{
-Plots the clipped EUMOHP data as grid using ggplot2.
+Plots the clipped EU-MOHP data as grid using ggplot2.
 }
 \examples{
 \dontrun{
 eumohp_clip(
-   directory_input = "directory/to/EUMOHPfiles/",
+   directory_input = "directory/to/EU-MOHPfiles/",
    region_name_spatcov = c("italy2"),
    hydrologic_order = 1:4,
    abbreviation_measure = c("dsd", "lp"),
@@ -33,7 +33,7 @@ eumohp_plot()
 # If you want to plot faster, you can increase the argument downsample:
 
 eumohp_clip(
-   directory_input = "directory/to/EUMOHPfiles/",
+   directory_input = "directory/to/EU-MOHPfiles/",
    region_name_spatcov = c("italy2"),
    hydrologic_order = 1:4,
    abbreviation_measure = c("dsd", "lp"),

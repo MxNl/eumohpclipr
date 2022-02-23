@@ -8,6 +8,7 @@ Authors@R:
            email = "max-n@posteo.de",
            comment = c(ORCID = " https://orcid.org/0000-0001-5606-1900"))
 Description: This package provides functionality for clipping the EU-MOHP data set to the administrative boundaries of a selected country. The administrative boundaries are based on the package rnaturalearth.
+Date: 2022-02-22
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,7 +22,6 @@ Imports:
     furrr,
     future,
     glue,
-    here,
     htmltools,
     lintr,
     patchwork,
@@ -40,7 +40,8 @@ Suggests:
     rnaturalearthdata,
     ggplot2,
     readr,
-    janitor
+    janitor,
+    badger
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
