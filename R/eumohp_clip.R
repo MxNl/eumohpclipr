@@ -416,6 +416,7 @@ eumohp_clip <- function(directory_input,
     recursive = TRUE,
     pattern = "mohp_europe_*.*tif"
   )
+  print(filepaths)
 
   subset_specs <-
     as.list(environment()) |>

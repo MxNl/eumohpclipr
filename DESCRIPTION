@@ -15,7 +15,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
-    covr,
     crayon,
     dplyr,
     DT,
@@ -34,6 +33,7 @@ Imports:
     styler,
     testthat
 Suggests: 
+    covr,
     rnaturalearth,
     devtools,
     usethis,
