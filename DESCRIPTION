@@ -41,7 +41,9 @@ Suggests:
     ggplot2,
     readr,
     janitor,
-    badger
+    badger,
+    mockery,
+    here
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

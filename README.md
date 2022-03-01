@@ -86,7 +86,7 @@ Specifying the spatial extent of the clipped result via the argument:
 ``` r
 eumohp_clipped_countries <- eumohp_clip(
   directory_input = eumohp_directory,
-  countries = c("germany", "poland"),
+  countries = c("germany", "denmark"),
   buffer = 1E4,
   hydrologic_order = 1:4,
   abbreviation_measure = c("dsd", "lp"),
@@ -143,27 +143,27 @@ directly for setting the spatial extent.
 
 ### Plotting
 
-You can plot the clipped and subsetted data with `eumohp_plot()`
+You can plot the clipped and subsetted data with `eumohp_plot()`.
 
 ``` r
 eumohp_clipped_countries |> 
   eumohp_plot(downsample = 200)
-#> [1] "germany-poland-b10000_dsd_hydrologicorder1_30m"
-#> [1] "germany-poland-b10000_dsd_hydrologicorder2_30m"
-#> [1] "germany-poland-b10000_dsd_hydrologicorder3_30m"
-#> [1] "germany-poland-b10000_dsd_hydrologicorder4_30m"
-#> [1] "germany-poland-b10000_lp_hydrologicorder1_30m"
-#> [1] "germany-poland-b10000_lp_hydrologicorder2_30m"
-#> [1] "germany-poland-b10000_lp_hydrologicorder3_30m"
-#> [1] "germany-poland-b10000_lp_hydrologicorder4_30m"
-#> Warning: Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
-#> Removed 12434 rows containing missing values (geom_raster).
+#> [1] "denmark-germany-b10000_dsd_hydrologicorder1_30m"
+#> [1] "denmark-germany-b10000_dsd_hydrologicorder2_30m"
+#> [1] "denmark-germany-b10000_dsd_hydrologicorder3_30m"
+#> [1] "denmark-germany-b10000_dsd_hydrologicorder4_30m"
+#> [1] "denmark-germany-b10000_lp_hydrologicorder1_30m"
+#> [1] "denmark-germany-b10000_lp_hydrologicorder2_30m"
+#> [1] "denmark-germany-b10000_lp_hydrologicorder3_30m"
+#> [1] "denmark-germany-b10000_lp_hydrologicorder4_30m"
+#> Warning: Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
+#> Removed 10204 rows containing missing values (geom_raster).
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" /> You

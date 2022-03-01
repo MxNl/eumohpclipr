@@ -82,11 +82,6 @@
 #' }
 #' @export
 eumohp_plot <- function(.eumohp_starsproxy, ...) {
-  test <- FALSE
-  if (test) {
-    .eumohp_starsproxy <- .eumohp_starsproxy
-  }
-
   .eumohp_starsproxy |>
     purrr::imap(.plot_single_order, ...) |>
     patchwork::wrap_plots(nrow = 3) +

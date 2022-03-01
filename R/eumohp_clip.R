@@ -79,7 +79,8 @@
       collapse = ", ")
     correct_strings <- str_c(eea39_countries, collapse = ", ")
   } else if (argument_name %in% filename_placeholders) {
-    correct_strings <- filename_placeholders_values |> {
+    correct_strings <- filename_placeholders_values |>
+      gsub(pattern = "streamorder", replacement = "") |> {
       \ (x) keep(x, names(x) == argument_name)
     }() |>
       as.vector()
@@ -281,10 +282,6 @@ eumohp_clip <- function(directory_input,
                         spatial_resolution = "30m",
                         eumohp_version = "v013.1.0",
                         buffer = NULL) {
-  filepaths <- directory_input |>
-    list.files(full.names = TRUE, recursive = TRUE) |> {
-      \ (x) x |> keep(str_detect(x, "mohp_europe_*.*tif"))
-    }()
   eea39_countries <- eea39_countries |> str_to_lower()
   filename_placeholders_values <- filename_placeholders_values |>
     str_remove("streamorder") |>
@@ -294,6 +291,26 @@ eumohp_clip <- function(directory_input,
                        "hydrologicorder"
   )
 
+  if (list(countries,
+           custom_sf_polygon,
+           region_name_spatcov) |>
+      purrr::map_lgl(is.null) |>
+      all()
+  ) {
+    abort(
+      paste0(
+        "You have to provide an argument for the spatial coverage. ",
+        "\nPlease provide exactly one of the following three arguments: ",
+        crayon::green(str_c(c(
+          "countries",
+          "custom_sf_polygon",
+          "region_name_spatcov"
+        ),
+        collapse = ", "
+        ))
+      )
+    )
+  }
   if (!.is_valid_mode_selection(
     countries,
     custom_sf_polygon,
@@ -322,7 +339,9 @@ eumohp_clip <- function(directory_input,
     abort(paste0(
       "Invalid sf object provided to the argument ",
       crayon::red("custom_sf_polygon"),
-      "."
+      "!",
+      "\nCheck if your provided sf object has just a single feature / row: ",
+      "\nIf not, use summarise() to union the features!"
     ))
   }
   if (!is.null(region_name_spatcov) &
@@ -359,6 +378,11 @@ eumohp_clip <- function(directory_input,
       ))
     ))
   }
+  if (!is.null(region_name_spatcov) &
+      !is.null(buffer)) {
+    abort(paste("Please don't provide the argument buffer",
+                "when using the region_name_spatcov argument!"))
+  }
 
   if (!is.null(countries) & (.is_valid_countries(countries) |> all())) {
     clip_layer <- .eumohp_covered_countries() |>
@@ -385,6 +409,13 @@ eumohp_clip <- function(directory_input,
       sf::st_buffer(dist = buffer) |>
       mutate(name = str_c(.data$name, "-b", buffer))
   }
+
+  filepaths <- list.files(
+    directory_input,
+    full.names = TRUE,
+    recursive = TRUE,
+    pattern = "mohp_europe_*.*tif"
+  )
 
   subset_specs <-
     as.list(environment()) |>

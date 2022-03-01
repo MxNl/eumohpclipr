@@ -75,7 +75,7 @@ Specifying the spatial extent of the clipped result via the argument: `countries
 ```{r}
 eumohp_clipped_countries <- eumohp_clip(
   directory_input = eumohp_directory,
-  countries = c("germany", "poland"),
+  countries = c("germany", "denmark"),
   buffer = 1E4,
   hydrologic_order = 1:4,
   abbreviation_measure = c("dsd", "lp"),
@@ -117,7 +117,7 @@ Here, the argument `buffer` can not be applied as we are already using the maxim
 
 ### Plotting
 
-You can plot the clipped and subsetted data with `eumohp_plot()`
+You can plot the clipped and subsetted data with `eumohp_plot()`.
 ```{r, fig.width=12, fig.height=10}
 eumohp_clipped_countries |> 
   eumohp_plot(downsample = 200)
