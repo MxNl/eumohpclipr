@@ -21,6 +21,7 @@ Imports:
     furrr,
     future,
     glue,
+    grid,
     htmltools,
     lintr,
     patchwork,

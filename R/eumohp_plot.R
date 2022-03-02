@@ -1,13 +1,29 @@
-.keep_name_pattern <- function(
-  list,
-  pattern
-) {
-  list |>
-    purrr::keep(
-      ~ str_detect(
-        names(.x),
-        str_c("_", pattern, "_")
-      )
+.patchwork_measures <- function(plot_list) {
+  patch <- plot_list |>
+    patchwork::wrap_plots(nrow = 1)
+
+  patch+grid::textGrob(plot_list |>
+                         names() |>
+                         purrr::chuck(1) |>
+                         stringr::word(start = 2, sep = "_") |>
+                         stringr::str_to_upper()) +
+    patchwork::plot_layout(widths = c(rep_len(10, length.out = length(plot_list)), 4))
+}
+.patchwork_all <- function(plot_list) {
+  plot_list |>
+    patchwork::wrap_plots(nrow = length(plot_list)) +
+    patchwork::plot_annotation(
+      title = plot_list |>
+        names() |>
+        purrr::chuck(1) |>
+        stringr::word(start = 1, sep = "_") |> {
+          \ (x) stringr::str_c("eumohp", x, sep = " - ")
+        }() |>
+        stringr::str_to_title(),
+      theme = ggplot2::theme(plot.title = ggplot2::element_text(
+        hjust = .5,
+        size = 12
+      ))
     )
 }
 .plot_single_order <- function(stars_object, name, downsample = 50) {
@@ -55,8 +71,7 @@
       subtitle = name |>
         stringr::word(start = 3, sep = "_") |>
         stringr::str_replace("([:alpha:]+)([1-9])", "\\1 \\2") |>
-        stringr::str_to_sentence(),
-      title = eumohp_measure |> stringr::str_to_upper()
+        stringr::str_to_sentence()
         )
 }
 
@@ -97,27 +112,13 @@ eumohp_plot <- function(.eumohp_starsproxy, ...) {
   eumohp_measures <- filename_placeholders_values[
     names(filename_placeholders_values) == "abbreviation_measure"]
 
-  .eumohp_starsproxy <- eumohp_measures |>
-    purrr::map(
-      ~ .keep_name_pattern(.eumohp_starsproxy, .x)
-    ) |>
-    purrr::set_names(eumohp_measures)
+  single_plots <- .eumohp_starsproxy |>
+    purrr::imap(.plot_single_order, ...)
 
-  .eumohp_starsproxy |>
-    purrr::chuck(1) |>
-    purrr::imap(.plot_single_order, ...) |>
-    patchwork::wrap_plots(nrow = 3) +
-    patchwork::plot_annotation(
-      title = .eumohp_starsproxy |>
-        names() |>
-        purrr::chuck(1) |>
-        stringr::word(start = 1, sep = "_") |> {
-          \ (x) stringr::str_c("eumohp", x, sep = " - ")
-        }() |>
-        stringr::str_to_title(),
-      theme = ggplot2::theme(plot.title = ggplot2::element_text(
-        hjust = .5,
-        size = 12
-      ))
-    )
+  fullnames <- single_plots |> names()
+
+  single_plots |>
+    split(f = str_remove(names(single_plots), "hydrologicorder\\d_")) |>
+    map(.patchwork_measures) |>
+    .patchwork_all()
 }
