@@ -36,11 +36,11 @@
       names(filename_placeholders_values) ==
         deparse(substitute(filename_placeholder))]
 }
-.replace_order_extension <- function(spec_list, order_name) {
-  spec_list$hydrologic_order <- str_replace(
-    spec_list$hydrologic_order,
-    "streamorder",
-    order_name)
+.with_order_extension <- function(spec_list, order_name) {
+  spec_list$hydrologic_order <- str_c(
+    order_name,
+    spec_list$hydrologic_order
+    )
   spec_list
 }
 .specs_to_pattern <- function(subset_list) {
@@ -165,6 +165,144 @@
               mustWork = TRUE) |>
     readRDS()
 }
+.check_args <- function(
+  countries,
+  custom_sf_polygon,
+  region_name_spatcov,
+  hydrologic_order,
+  abbreviation_measure,
+  spatial_resolution,
+  eumohp_version,
+  buffer,
+  order_name
+  ) {
+  if (list(countries,
+           custom_sf_polygon,
+           region_name_spatcov) |>
+      purrr::map_lgl(is.null) |>
+      all()
+  ) {
+    abort(
+      paste0(
+        "You have to provide an argument for the spatial coverage. ",
+        "\nPlease provide exactly one of the following three arguments: ",
+        crayon::green(str_c(c(
+          "countries",
+          "custom_sf_polygon",
+          "region_name_spatcov"
+        ),
+        collapse = ", "
+        ))
+      )
+    )
+  }
+  if (!.is_valid_mode_selection(
+    countries,
+    custom_sf_polygon,
+    region_name_spatcov
+  )) {
+    abort(
+      paste0(
+        "You provided more than one argument for the spatial coverage. ",
+        "Please provide exactly one of the following three arguments: ",
+        crayon::green(str_c(c(
+          "countries",
+          "custom_sf_polygon",
+          "region_name_spatcov"
+        ),
+        collapse = ", "
+        ))
+      )
+    )
+  }
+  if (!is.null(countries) & !(.is_valid_countries(countries) |> all())) {
+    .generate_error_message(countries)
+  }
+  if (!is.null(custom_sf_polygon) &
+      !(.is_valid_custom_sf_polygon(custom_sf_polygon) |>
+        all())) {
+    abort(paste0(
+      "Invalid sf object provided to the argument ",
+      crayon::red("custom_sf_polygon"),
+      "!"
+      # "\nCheck if your provided sf object has just a single feature / row: ",
+      # "\nIf not, please use the function summarise from the sf package to merge the features!"
+    ))
+  }
+  if (!is.null(region_name_spatcov) &
+      !(.is_valid_placeholders_value(region_name_spatcov) |>
+        all())) {
+    .generate_error_message(region_name_spatcov)
+  }
+  if (!is.null(hydrologic_order) &
+      !(.is_valid_placeholders_value(hydrologic_order) |>
+        all())) {
+    .generate_error_message(hydrologic_order)
+  } else if (!is.null(hydrologic_order)) {
+    hydrologic_order <- str_c(order_name, hydrologic_order)
+  }
+  if (!is.null(abbreviation_measure) &
+      !(.is_valid_placeholders_value(abbreviation_measure) |>
+        all())) {
+    .generate_error_message(abbreviation_measure)
+  }
+  if (!is.null(spatial_resolution) &
+      !(.is_valid_placeholders_value(spatial_resolution) |>
+        all())) {
+    .generate_error_message(spatial_resolution)
+  }
+  if (!.is_valid_eumohp_version(eumohp_version)) {
+    abort(paste0(
+      "Invalid eumohp version provided to the argument ",
+      crayon::red("eumohp_version"),
+      ":\n",
+      crayon::red(eumohp_version),
+      "\nPlease check if your provided value is one of:\n",
+      crayon::green(str_c(c("v013.1.0", "v013.1.1"),
+                          collapse = ", "
+      ))
+    ))
+  }
+  if (!is.null(region_name_spatcov) &
+      !is.null(buffer)) {
+    abort(paste("Please don't provide the argument buffer",
+                "when using the region_name_spatcov argument!"))
+  }
+}
+
+.generate_clip_layer <- function(
+  countries,
+  custom_sf_polygon,
+  buffer
+  ) {
+
+  if (!is.null(countries) & (.is_valid_countries(countries) |> all())) {
+    clip_layer <- .eumohp_covered_countries() |>
+      filter(str_to_lower(.data$name) %in% countries) |>
+      arrange(.data$name) |>
+      group_by(name = str_to_lower(str_c(.data$name, collapse = "-"))) |>
+      summarise()
+  } else if (!is.null(custom_sf_polygon) &
+             (.is_valid_custom_sf_polygon(custom_sf_polygon) |>
+              all())) {
+    clip_layer <-
+      custom_sf_polygon |>
+      sf::st_geometry() |>
+      sf::st_as_sf() |>
+      sf::st_cast("MULTIPOLYGON") |>
+      dplyr::rename(geometry = .data$x) |>
+      mutate(name = "custompolygon", .before = 1)
+  } else {
+    clip_layer <- NULL
+  }
+
+  if (is.numeric(buffer)) {
+    clip_layer <- clip_layer |>
+      sf::st_buffer(dist = buffer) |>
+      mutate(name = str_c(.data$name, "-b", buffer))
+  }
+  clip_layer
+}
 
 
 
@@ -282,133 +420,35 @@ eumohp_clip <- function(directory_input,
                         spatial_resolution = "30m",
                         eumohp_version = "v013.1.0",
                         buffer = NULL) {
+
   eea39_countries <- eea39_countries |> str_to_lower()
+
   filename_placeholders_values <- filename_placeholders_values |>
     str_remove("streamorder") |>
     purrr::set_names(names(filename_placeholders_values))
+
   order_name <- ifelse(eumohp_version == eumohp_versions[1],
-                       "streamorder",
-                       "hydrologicorder"
+    "streamorder",
+    "hydrologicorder"
   )
 
-  if (list(countries,
-           custom_sf_polygon,
-           region_name_spatcov) |>
-      purrr::map_lgl(is.null) |>
-      all()
-  ) {
-    abort(
-      paste0(
-        "You have to provide an argument for the spatial coverage. ",
-        "\nPlease provide exactly one of the following three arguments: ",
-        crayon::green(str_c(c(
-          "countries",
-          "custom_sf_polygon",
-          "region_name_spatcov"
-        ),
-        collapse = ", "
-        ))
-      )
-    )
-  }
-  if (!.is_valid_mode_selection(
+  .check_args(
     countries,
     custom_sf_polygon,
-    region_name_spatcov
-  )) {
-    abort(
-      paste0(
-        "You provided more than one argument for the spatial coverage. ",
-        "Please provide exactly one of the following three arguments: ",
-        crayon::green(str_c(c(
-          "countries",
-          "custom_sf_polygon",
-          "region_name_spatcov"
-        ),
-        collapse = ", "
-        ))
-      )
-    )
-  }
-  if (!is.null(countries) & !(.is_valid_countries(countries) |> all())) {
-    .generate_error_message(countries)
-  }
-  if (!is.null(custom_sf_polygon) &
-      !(.is_valid_custom_sf_polygon(custom_sf_polygon) |>
-        all())) {
-    abort(paste0(
-      "Invalid sf object provided to the argument ",
-      crayon::red("custom_sf_polygon"),
-      "!",
-      "\nCheck if your provided sf object has just a single feature / row: ",
-      "\nIf not, use summarise() to union the features!"
-    ))
-  }
-  if (!is.null(region_name_spatcov) &
-      !(.is_valid_placeholders_value(region_name_spatcov) |>
-        all())) {
-    .generate_error_message(region_name_spatcov)
-  }
-  if (!is.null(hydrologic_order) &
-      !(.is_valid_placeholders_value(hydrologic_order) |>
-        all())) {
-    .generate_error_message(hydrologic_order)
-  } else if (!is.null(hydrologic_order)) {
-    hydrologic_order <- str_c(order_name, hydrologic_order)
-  }
-  if (!is.null(abbreviation_measure) &
-      !(.is_valid_placeholders_value(abbreviation_measure) |>
-        all())) {
-    .generate_error_message(abbreviation_measure)
-  }
-  if (!is.null(spatial_resolution) &
-      !(.is_valid_placeholders_value(spatial_resolution) |>
-        all())) {
-    .generate_error_message(spatial_resolution)
-  }
-  if (!.is_valid_eumohp_version(eumohp_version)) {
-    abort(paste0(
-      "Invalid eumohp version provided to the argument ",
-      crayon::red("eumohp_version"),
-      ":\n",
-      crayon::red(eumohp_version),
-      "\nPlease check if your provided value is one of:\n",
-      crayon::green(str_c(c("v013.1.0", "v013.1.1"),
-                          collapse = ", "
-      ))
-    ))
-  }
-  if (!is.null(region_name_spatcov) &
-      !is.null(buffer)) {
-    abort(paste("Please don't provide the argument buffer",
-                "when using the region_name_spatcov argument!"))
-  }
+    region_name_spatcov,
+    hydrologic_order,
+    abbreviation_measure,
+    spatial_resolution,
+    eumohp_version,
+    buffer,
+    order_name
+  )
 
-  if (!is.null(countries) & (.is_valid_countries(countries) |> all())) {
-    clip_layer <- .eumohp_covered_countries() |>
-      filter(str_to_lower(.data$name) %in% countries) |>
-      arrange(.data$name) |>
-      group_by(name = str_to_lower(str_c(.data$name, collapse = "-"))) |>
-      summarise()
-  } else if (!is.null(custom_sf_polygon) &
-             (.is_valid_custom_sf_polygon(custom_sf_polygon) |>
-              all())) {
-    clip_layer <-
-      custom_sf_polygon |>
-      sf::st_geometry() |>
-      sf::st_as_sf() |>
-      sf::st_cast("MULTIPOLYGON") |>
-      dplyr::rename(geometry = .data$x) |>
-      mutate(name = "custompolygon", .before = 1)
-  } else {
-    clip_layer <- NULL
-  }
-
-  if (is.numeric(buffer)) {
-    clip_layer <- clip_layer |>
-      sf::st_buffer(dist = buffer) |>
-      mutate(name = str_c(.data$name, "-b", buffer))
-  }
+  clip_layer <- .generate_clip_layer(
+    countries,
+    custom_sf_polygon,
+    buffer
+  )
 
   filepaths <- list.files(
     directory_input,
@@ -416,13 +456,13 @@ eumohp_clip <- function(directory_input,
     recursive = TRUE,
     pattern = "mohp_europe_*.*tif"
   )
-  print(filepaths)
 
   subset_specs <-
     as.list(environment()) |>
     magrittr::extract(filename_placeholders) |>
     purrr::compact() |>
-    .complete_subsetspecs()
+    .complete_subsetspecs() |>
+    .with_order_extension(order_name)
 
   filepaths_subset <- filepaths |> .subset_filepaths(subset_specs)
   filepaths_subset |>

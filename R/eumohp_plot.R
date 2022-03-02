@@ -2,7 +2,6 @@
 
   eumohp_measures <- filename_placeholders_values[
     names(filename_placeholders_values) == "abbreviation_measure"]
-  print(name)
   eumohp_measure <- name |> stringr::word(start = 2, sep = "_")
 
   if (eumohp_measure == eumohp_measures[2]) {

@@ -3,7 +3,7 @@ test_that("Invalid combination of args: countries, custom_, region_", {
     eumohp_clip(
       directory_input = NULL,
       countries = c("france"),
-      custom_sf_polygon = .test_custom_sf_polygon(),
+      custom_sf_polygon = "test_arg",
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ),
@@ -26,7 +26,7 @@ test_that("Invalid combination of args: countries, custom_sf_polygon", {
     eumohp_clip(
       directory_input = NULL,
       countries = c("france"),
-      custom_sf_polygon = .test_custom_sf_polygon(),
+      custom_sf_polygon = "test_arg",
       eumohp_version = "v013.1.1"
     )
   )
@@ -48,7 +48,7 @@ test_that("Invalid combination of args: custom_sf_polygon, region_", {
   expect_error(
     eumohp_clip(
       directory_input = NULL,
-      custom_sf_polygon = .test_custom_sf_polygon(),
+      custom_sf_polygon = "test_arg",
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ),
@@ -72,10 +72,14 @@ test_that("Invalid sf object as custom_sf_polygon", {
   expect_error(
     eumohp_clip(
       directory_input = NULL,
-      custom_sf_polygon = .test_custom_sf_polygon(),
+      custom_sf_polygon = readRDS(
+        system.file(
+          "extdata",
+          "test_custom_sf_polygon.Rds",
+          package = "eumohpclipr")),
       eumohp_version = "v013.1.1"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid sf object provided to the argument custom_sf_polygon!"
   )
 })
 
@@ -85,8 +89,11 @@ test_that("Invalid values for arg: countries", {
       directory_input = NULL,
       countries = c("France", "GREECE"),
       eumohp_version = "v013.1.1"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid values provided to the argument countries:
+ France, GREECE
+Please check if your provided value\\(s\\) is/are one of:
+austria, belgium, bulgaria, croatia, cyprus, czech rep\\., denmark, estonia, finland, france, germany, greece, hungary, iceland, ireland, italy, latvia, liechtenstein, lithuania, luxembourg, malta, netherlands, norway, poland, portugal, romania, slovakia, slovenia, spain, sweden, switzerland, turkey, albania, bosnia and herz\\., kosovo, montenegro, macedonia, serbia, united kingdom" # nolint
   )
 })
 
@@ -96,8 +103,11 @@ test_that("Invalid values for arg: region_name_spatcov", {
       directory_input = NULL,
       region_name_spatcov = c("France", "GREECE"),
       eumohp_version = "v013.1.1"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid values provided to the argument region_name_spatcov:
+ France, GREECE
+Please check if your provided value\\(s\\) is/are one of:
+europemainland, finland-norway-sweden, france, greece, iceland, italy1, italy2, turkey, unitedkingdom, unitedkingdom-ireland" # nolint
   )
 })
 
@@ -108,8 +118,11 @@ test_that("Invalid values for arg: region_name_spatcov", {
       region_name_spatcov = "france",
       hydrologic_order = c(1:3, "fourth", 10),
       eumohp_version = "v013.1.1"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid values provided to the argument hydrologic_order:
+ fourth, 10
+Please check if your provided value\\(s\\) is/are one of:
+1, 2, 3, 4, 5, 6, 7, 8, 9"
   )
 })
 
@@ -119,8 +132,11 @@ test_that("Invalid values for arg: eumohp_version", {
       directory_input = NULL,
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1s"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid eumohp version provided to the argument eumohp_version:
+v013\\.1\\.1s
+Please check if your provided value is one of:
+v013\\.1\\.0, v013\\.1\\.1"
   )
 })
 
@@ -129,9 +145,12 @@ test_that("Invalid values for arg: abbreviation_measure", {
     eumohp_clip(
       directory_input = NULL,
       region_name_spatcov = "france",
-      abbreviation_measure = c("dsd", "lp", "st")
-    )
-    # add error message: problem with newlines
+      abbreviation_measure = c(1, "lp", "st")
+    ),
+    "Invalid values provided to the argument abbreviation_measure:
+ 1, st
+Please check if your provided value\\(s\\) is/are one of:
+dsd, lp, sd"
   )
 })
 
@@ -141,25 +160,28 @@ test_that("Invalid values for arg: spatial_resolution", {
       directory_input = NULL,
       region_name_spatcov = "france",
       spatial_resolution = "40m"
-    )
-    # add error message: problem with newlines
+    ),
+    "Invalid values provided to the argument spatial_resolution:
+ 40m
+Please check if your provided value\\(s\\) is/are one of:
+30m"
   )
 })
 
 test_that("Length of value", {
   expect_length(
     eumohp_clip(
-      directory_input = system.file("tests/fixtures", package = "eumohpclipr"),
+      directory_input = system.file(".", package = "eumohpclipr"),
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ),
-    18
+    6
   )
 })
 
 test_that("Class of value", {
   expect_equal(
-    eumohp_clip(system.file("tests/fixtures", package = "eumohpclipr"),
+    eumohp_clip(system.file(".", package = "eumohpclipr"),
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ) |>
