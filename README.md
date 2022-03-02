@@ -148,14 +148,6 @@ You can plot the clipped and subsetted data with `eumohp_plot()`.
 ``` r
 eumohp_clipped_countries |> 
   eumohp_plot(downsample = 200)
-#> [1] "denmark-germany-b10000_dsd_hydrologicorder1_30m"
-#> [1] "denmark-germany-b10000_dsd_hydrologicorder2_30m"
-#> [1] "denmark-germany-b10000_dsd_hydrologicorder3_30m"
-#> [1] "denmark-germany-b10000_dsd_hydrologicorder4_30m"
-#> [1] "denmark-germany-b10000_lp_hydrologicorder1_30m"
-#> [1] "denmark-germany-b10000_lp_hydrologicorder2_30m"
-#> [1] "denmark-germany-b10000_lp_hydrologicorder3_30m"
-#> [1] "denmark-germany-b10000_lp_hydrologicorder4_30m"
 #> Warning: Removed 10204 rows containing missing values (geom_raster).
 #> Removed 10204 rows containing missing values (geom_raster).
 #> Removed 10204 rows containing missing values (geom_raster).
