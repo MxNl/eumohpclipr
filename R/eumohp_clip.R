@@ -224,9 +224,10 @@
     abort(paste0(
       "Invalid sf object provided to the argument ",
       crayon::red("custom_sf_polygon"),
-      "!"
-      # "\nCheck if your provided sf object has just a single feature / row: ",
-      # "\nIf not, please use the function summarise from the sf package to merge the features!"
+      ".",
+      "\nCheck if your provided sf object has just a single feature. ",
+      "If not, please use the function summarise from the sf package ",
+      "to merge the features."
     ))
   }
   if (!is.null(region_name_spatcov) &

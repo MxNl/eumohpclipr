@@ -79,7 +79,8 @@ test_that("Invalid sf object as custom_sf_polygon", {
           package = "eumohpclipr")),
       eumohp_version = "v013.1.1"
     ),
-    "Invalid sf object provided to the argument custom_sf_polygon!"
+    "Invalid sf object provided to the argument custom_sf_polygon.
+Check if your provided sf object has just a single feature. If not, please use the function summarise from the sf package to merge the features." # nolint
   )
 })
 

@@ -1,3 +1,15 @@
+.keep_name_pattern <- function(
+  list,
+  pattern
+) {
+  list |>
+    purrr::keep(
+      ~ str_detect(
+        names(.x),
+        str_c("_", pattern, "_")
+      )
+    )
+}
 .plot_single_order <- function(stars_object, name, downsample = 50) {
 
   eumohp_measures <- filename_placeholders_values[
@@ -81,7 +93,18 @@
 #' }
 #' @export
 eumohp_plot <- function(.eumohp_starsproxy, ...) {
+
+  eumohp_measures <- filename_placeholders_values[
+    names(filename_placeholders_values) == "abbreviation_measure"]
+
+  .eumohp_starsproxy <- eumohp_measures |>
+    purrr::map(
+      ~ .keep_name_pattern(.eumohp_starsproxy, .x)
+    ) |>
+    purrr::set_names(eumohp_measures)
+
   .eumohp_starsproxy |>
+    purrr::chuck(1) |>
     purrr::imap(.plot_single_order, ...) |>
     patchwork::wrap_plots(nrow = 3) +
     patchwork::plot_annotation(
