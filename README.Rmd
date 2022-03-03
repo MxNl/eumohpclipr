@@ -127,6 +127,18 @@ eumohp_clipped_countries |>
 ```
 You don't have to provide the `downsample` argument, as it has a default value. But if your area of interest is quite large, a higher value for this argument reduces the time to plot.
 
+Analogous with the second example
+```{r, fig.width=12, fig.height=10}
+eumohp_clipped_customsfpolygon |> 
+  eumohp_plot(downsample = 1)
+```
+
+Analogous with the third example
+```{r, fig.width=12, fig.height=10}
+eumohp_clipped_regionnamespatcov |> 
+  eumohp_plot(downsample = 10)
+```
+
 ### Writing Results to Disk
 
 Regarding run time and memory, writing the data is the crucial part. This can be very expensive. This is why it is recommended to run this in parallel mode on a computer with sufficient memory and can be shut on for a few hours or days.

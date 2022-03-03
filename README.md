@@ -165,6 +165,40 @@ don’t have to provide the `downsample` argument, as it has a default
 value. But if your area of interest is quite large, a higher value for
 this argument reduces the time to plot.
 
+Analogous with the second example
+
+``` r
+eumohp_clipped_customsfpolygon |> 
+  eumohp_plot(downsample = 1)
+#> Warning: Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+#> Removed 381835 rows containing missing values (geom_raster).
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+Analogous with the third example
+
+``` r
+eumohp_clipped_regionnamespatcov |> 
+  eumohp_plot(downsample = 10)
+#> Warning: Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+#> Removed 20654991 rows containing missing values (geom_raster).
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
 ### Writing Results to Disk
 
 Regarding run time and memory, writing the data is the crucial part.
