@@ -36,11 +36,11 @@
       names(filename_placeholders_values) ==
         deparse(substitute(filename_placeholder))]
 }
-.replace_order_extension <- function(spec_list, order_name) {
-  spec_list$hydrologic_order <- str_replace(
-    spec_list$hydrologic_order,
-    "streamorder",
-    order_name)
+.with_order_extension <- function(spec_list, order_name) {
+  spec_list$hydrologic_order <- str_c(
+    order_name,
+    spec_list$hydrologic_order
+    )
   spec_list
 }
 .specs_to_pattern <- function(subset_list) {
@@ -79,7 +79,8 @@
       collapse = ", ")
     correct_strings <- str_c(eea39_countries, collapse = ", ")
   } else if (argument_name %in% filename_placeholders) {
-    correct_strings <- filename_placeholders_values |> {
+    correct_strings <- filename_placeholders_values |>
+      gsub(pattern = "streamorder", replacement = "") |> {
       \ (x) keep(x, names(x) == argument_name)
     }() |>
       as.vector()
@@ -111,15 +112,8 @@
                     sep = "_")
 }
 .starsproxylist_as_mosaic <- function(starsproxylist) {
-  mosaic <- stars::st_mosaic(starsproxylist[[1]])
-
-  if (length(starsproxylist) > 1) {
-    for (i in 2:length(starsproxylist)) {
-      mosaic <-
-        stars::st_mosaic(mosaic, starsproxylist[[i]])
-    }
-  }
-  mosaic
+  starsproxylist |>
+    purrr::reduce(.f = stars::st_mosaic)
 }
 .read_starsproxy_aslist <- function(filepaths) {
   filepaths |>
@@ -129,11 +123,21 @@
   filepaths_subset <- filepaths_subset |>
     group_by(dplyr::across(dplyr::all_of(filename_placeholders[2:4])))
 
+  if (is.null(clip_layer)) {
+    spatial_prefix <- filepaths_subset |>
+      arrange(.data$region_name_spatcov) |>
+      dplyr::pull(.data$region_name_spatcov) |>
+      unique() |>
+      str_c(collapse = "-")
+  } else {
+    spatial_prefix <- clip_layer$name
+  }
+
   mosaic_names <- filepaths_subset |>
     summarise(.groups = "drop") |>
     tidyr::unite(mosaic_names) |>
     dplyr::pull(mosaic_names) |> {
-      \ (x) str_c(clip_layer$name, x, sep = "_")
+      \ (x) str_c(spatial_prefix, x, sep = "_")
     }()
 
   all_regions <- filepaths_subset |>
@@ -161,123 +165,37 @@
               mustWork = TRUE) |>
     readRDS()
 }
-
-
-
-#' Clip EUMOHP raster data to an arbitrary polygon
-#'
-#' @param directory_input A string describing a directory
-#' where all the EUMOHP .tif files are located.
-#' The provided directory will be searched recursively for files starting
-#' with 'eumohp_' file name prefix and a .tif ending.
-#' @param countries A character vector of arbitrary length.
-#' Each element of this vector should be a name of a country
-#' that belongs to the EEA39 countries.
-#' To see a list of these countries call 'eea39_countries' in the R console.
-#' If you provide this argument, you can specify
-#' the countries that should be clipped from
-#' the EUMOHP data set. The rnaturalearth boundaries
-#' will be used as administrative
-#' boundaries for clipping.
-#' You can only provide on the following three arguments: countries,
-#' custom_sf_polygon, region_name_spatcov.
-#' @param custom_sf_polygon A simple feature collection with a single feature of
-#' geometry type 'POLYGON'.
-#' If you have more than one feature,
-#' use summarise() to union the features.
-#' If you provide this argument,
-#' the EUHMOHP data set will be clipped using these polygons.
-#' You can only provide on the following three arguments: countries,
-#' custom_sf_polygon, region_name_spatcov.
-#' @param region_name_spatcov A character vector of arbitrary length.
-#' Each element of this vector should be a
-#' value of the placeholder region_name_spatcov
-#' according to the file naming scheme of the EUMOHP data set.
-#' If you provide this argument, you can specify the .tif files
-#' of the EUMOHP data set that should be clipped
-#' included in the clipped output of this function.
-#' You can only provide on the following three arguments: countries,
-#' custom_sf_polygon, region_name_spatcov.
-#' @param hydrologic_order A integer vector of arbitrary length.
-#' Via this argument you can specify the hydrologic orders
-#' that you want to obtain in the clipped result of this function.
-#' The default is all hydrologic orders (1 - 9).
-#' @param abbreviation_measure A character vector of arbitrary length,
-#' but maximum length 3.
-#' Via this argument you can specify the measures
-#' that you want to obtain in the clipped result of this function.
-#' The default is all measures (dsd', 'lp' and 'sd').
-#' @param spatial_resolution A character vector of length 1.
-#' Via this argument you can specify the spatial resolution
-#' that you want to obtain in the clipped result of this function.
-#' The default is 30m. Currently, there is only a resolution of 30m available.
-#' @param eumohp_version A character vector of length 1.
-#' Via this argument you specify the EUMOHP version
-#' that you are using / have downloaded.
-#' The default is v013.1.0.
-#' @param buffer A numeric vector of length 1 (optionally).
-#' Via this argument you can specify a buffer in meters
-#' that should be applied to the the provided polygons / countries.
-#' If you provided the argument region_name_spatcov,
-#' this argument is irrelevant.
-#' The default is NULL.
-#' @return A list of stars_proxy objects with the user
-#' specified spatial extent / shape.
-#' @examples
-#' \dontrun{
-#' Specifying the spatial extent of the clipped result
-#' via the argument: countries
-#' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
-#'    countries = "germany",
-#'    buffer = 1E4,
-#'    hydrologic_order = 1:4,
-#'    abbreviation_measure = c("dsd", "lp"),
-#'    eumohp_version = "v013.1.1"
-#' )
-#' Specifying the spatial extent of the clipped result
-#' via the argument: custom_sf_polygon
-#' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
-#'    custom_sf_polygon = .test_custom_sf_polygon() |> summarise(),
-#'    buffer = 1E4,
-#'    hydrologic_order = 1:4,
-#'    abbreviation_measure = c("dsd", "lp"),
-#'    eumohp_version = "v013.1.1"
-#' )
-#' Specifying the spatial extent of the clipped result
-#' via the argument: region_name_spatcov
-#' eumohp_clip(
-#'    directory_input = "directory/to/EUMOHPfiles/",
-#'    region_name_spatcov = c("france", "turkey", "italy2"),
-#'    hydrologic_order = 1:4,
-#'    abbreviation_measure = c("dsd", "lp"),
-#'    eumohp_version = "v013.1.1"
-#' )
-#' }
-#' @export
-eumohp_clip <- function(directory_input,
-                        countries = NULL,
-                        custom_sf_polygon = NULL,
-                        region_name_spatcov = NULL,
-                        hydrologic_order = 1:9,
-                        abbreviation_measure = c("dsd", "lp", "sd"),
-                        spatial_resolution = "30m",
-                        eumohp_version = "v013.1.0",
-                        buffer = NULL) {
-  filepaths <- directory_input |>
-    list.files(full.names = TRUE, recursive = TRUE) |> {
-      \ (x) x |> keep(str_detect(x, "mohp_europe_*.*tif"))
-    }()
-  eea39_countries <- eea39_countries |> str_to_lower()
-  filename_placeholders_values <- filename_placeholders_values |>
-    str_remove("streamorder") |>
-    purrr::set_names(names(filename_placeholders_values))
-  order_name <- ifelse(eumohp_version == eumohp_versions[1],
-                       "streamorder",
-                       "hydrologicorder"
-  )
-
+.check_args <- function(
+  countries,
+  custom_sf_polygon,
+  region_name_spatcov,
+  hydrologic_order,
+  abbreviation_measure,
+  spatial_resolution,
+  eumohp_version,
+  buffer,
+  order_name
+  ) {
+  if (list(countries,
+           custom_sf_polygon,
+           region_name_spatcov) |>
+      purrr::map_lgl(is.null) |>
+      all()
+  ) {
+    abort(
+      paste0(
+        "You have to provide an argument for the spatial coverage. ",
+        "\nPlease provide exactly one of the following three arguments: ",
+        crayon::green(str_c(c(
+          "countries",
+          "custom_sf_polygon",
+          "region_name_spatcov"
+        ),
+        collapse = ", "
+        ))
+      )
+    )
+  }
   if (!.is_valid_mode_selection(
     countries,
     custom_sf_polygon,
@@ -306,7 +224,10 @@ eumohp_clip <- function(directory_input,
     abort(paste0(
       "Invalid sf object provided to the argument ",
       crayon::red("custom_sf_polygon"),
-      "."
+      ".",
+      "\nCheck if your provided sf object has just a single feature. ",
+      "If not, please use the function summarise from the sf package ",
+      "to merge the features."
     ))
   }
   if (!is.null(region_name_spatcov) &
@@ -318,6 +239,8 @@ eumohp_clip <- function(directory_input,
       !(.is_valid_placeholders_value(hydrologic_order) |>
         all())) {
     .generate_error_message(hydrologic_order)
+  } else if (!is.null(hydrologic_order)) {
+    hydrologic_order <- str_c(order_name, hydrologic_order)
   }
   if (!is.null(abbreviation_measure) &
       !(.is_valid_placeholders_value(abbreviation_measure) |>
@@ -341,6 +264,18 @@ eumohp_clip <- function(directory_input,
       ))
     ))
   }
+  if (!is.null(region_name_spatcov) &
+      !is.null(buffer)) {
+    abort(paste("Please don't provide the argument buffer",
+                "when using the region_name_spatcov argument!"))
+  }
+}
+
+.generate_clip_layer <- function(
+  countries,
+  custom_sf_polygon,
+  buffer
+  ) {
 
   if (!is.null(countries) & (.is_valid_countries(countries) |> all())) {
     clip_layer <- .eumohp_covered_countries() |>
@@ -364,17 +299,173 @@ eumohp_clip <- function(directory_input,
 
   if (is.numeric(buffer)) {
     clip_layer <- clip_layer |>
-      sf::st_buffer(dist = buffer)
+      sf::st_buffer(dist = buffer) |>
+      mutate(name = str_c(.data$name, "-b", buffer))
   }
+  clip_layer
+}
+
+
+
+#' Clip EU-MOHP raster data to an arbitrary polygon
+#'
+#' Clips the EU-MOHP raster data files as downloaded from the
+#' hydroshare data hosting platform. The files must be unzipped after
+#' the download. You can not only clip the files to a spatial extent,
+#' but you can also specify a selection of the data.
+#' This function works lazily through using the stars package.
+#' This means, that clipping and plotting
+#' (using eumohp_plot()) works really fast. Whereas writing the data
+#' (using eumohp_write()) is really slow.
+#'
+#' @param directory_input A string describing a directory
+#' where all the EU-MOHP .tif files are located.
+#' The provided directory will be searched recursively for files starting
+#' with 'eumohp_' file name prefix and a .tif ending.
+#' @param countries A character vector of arbitrary length.
+#' Each element of this vector should be a name of a country
+#' that belongs to the EEA39 countries.
+#' To see a list of these countries call 'eea39_countries' in the R console.
+#' If you provide this argument, you can specify
+#' the countries that should be clipped from
+#' the EU-MOHP data set. The rnaturalearth boundaries
+#' will be used as administrative
+#' boundaries for clipping.
+#' You can only provide on the following three arguments: countries,
+#' custom_sf_polygon, region_name_spatcov.
+#' @param custom_sf_polygon A simple feature collection with a single feature of
+#' geometry type 'POLYGON'.
+#' If you have more than one feature,
+#' use summarise() to union the features.
+#' If you provide this argument,
+#' the EUHMOHP data set will be clipped using these polygons.
+#' You can only provide on the following three arguments: countries,
+#' custom_sf_polygon, region_name_spatcov.
+#' @param region_name_spatcov A character vector of arbitrary length.
+#' Each element of this vector should be a
+#' value of the placeholder region_name_spatcov
+#' according to the file naming scheme of the EU-MOHP data set.
+#' If you provide this argument, you can specify the .tif files
+#' of the EU-MOHP data set that should be clipped
+#' included in the clipped output of this function.
+#' You can only provide on the following three arguments: countries,
+#' custom_sf_polygon, region_name_spatcov.
+#' @param hydrologic_order A integer vector of arbitrary length.
+#' Via this argument you can specify the hydrologic orders
+#' that you want to obtain in the clipped result of this function.
+#' The default is all hydrologic orders (1 - 9).
+#' @param abbreviation_measure A character vector of arbitrary length,
+#' but maximum length 3.
+#' Via this argument you can specify the measures
+#' that you want to obtain in the clipped result of this function.
+#' The default is all measures (dsd', 'lp' and 'sd').
+#' @param spatial_resolution A character vector of length 1.
+#' Via this argument you can specify the spatial resolution
+#' that you want to obtain in the clipped result of this function.
+#' The default is 30m. Currently, there is only a resolution of 30m available.
+#' @param eumohp_version A character vector of length 1.
+#' Via this argument you specify the EU-MOHP version
+#' that you are using / have downloaded.
+#' The default is v013.1.0.
+#' @param buffer A numeric vector of length 1 (optionally).
+#' Via this argument you can specify a buffer in meters
+#' that should be applied to the the provided polygons / countries.
+#' If you provided the argument region_name_spatcov,
+#' this argument is irrelevant.
+#' The default is NULL.
+#' @return A list of stars_proxy objects with the user
+#' specified spatial extent / shape.
+#' @examples
+#' \dontrun{
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: countries
+#' eumohp_clip(
+#'    directory_input = "directory/to/EU-MOHPfiles/",
+#'    countries = "germany",
+#'    buffer = 1E4,
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' )
+#'
+#'
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: custom_sf_polygon
+#' eumohp_clip(
+#'    directory_input = "directory/to/EU-MOHPfiles/",
+#'    custom_sf_polygon = .test_custom_sf_polygon() |> summarise(),
+#'    buffer = 1E4,
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' )
+#'
+#'
+#' # Specifying the spatial extent of the clipped result
+#' # via the argument: region_name_spatcov
+#' eumohp_clip(
+#'    directory_input = "directory/to/EU-MOHPfiles/",
+#'    region_name_spatcov = c("france", "turkey", "italy2"),
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' )
+#' }
+#' @export
+eumohp_clip <- function(directory_input,
+                        countries = NULL,
+                        custom_sf_polygon = NULL,
+                        region_name_spatcov = NULL,
+                        hydrologic_order = 1:9,
+                        abbreviation_measure = c("dsd", "lp", "sd"),
+                        spatial_resolution = "30m",
+                        eumohp_version = "v013.1.0",
+                        buffer = NULL) {
+
+  eea39_countries <- eea39_countries |> str_to_lower()
+
+  filename_placeholders_values <- filename_placeholders_values |>
+    str_remove("streamorder") |>
+    purrr::set_names(names(filename_placeholders_values))
+
+  order_name <- ifelse(eumohp_version == eumohp_versions[1],
+    "streamorder",
+    "hydrologicorder"
+  )
+
+  .check_args(
+    countries,
+    custom_sf_polygon,
+    region_name_spatcov,
+    hydrologic_order,
+    abbreviation_measure,
+    spatial_resolution,
+    eumohp_version,
+    buffer,
+    order_name
+  )
+
+  clip_layer <- .generate_clip_layer(
+    countries,
+    custom_sf_polygon,
+    buffer
+  )
+
+  filepaths <- list.files(
+    directory_input,
+    full.names = TRUE,
+    recursive = TRUE,
+    pattern = "mohp_europe_*.*tif"
+  )
 
   subset_specs <-
     as.list(environment()) |>
-    keep(.p = \ (x) {
-      names(x) %in% filename_placeholders |> any()
-    }) |>
+    magrittr::extract(filename_placeholders) |>
+    purrr::compact() |>
     .complete_subsetspecs() |>
-    .replace_order_extension(order_name)
+    .with_order_extension(order_name)
 
   filepaths_subset <- filepaths |> .subset_filepaths(subset_specs)
-  .read_and_clip_stars(filepaths_subset, clip_layer)
+  filepaths_subset |>
+    .read_and_clip_stars(clip_layer)
 }

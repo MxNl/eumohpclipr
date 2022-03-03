@@ -26,7 +26,7 @@ jobs:
 
       - name: Install linux libraries
         run: |
-          sudo apt-get install -yqq --no-install-recommends libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev
+          sudo apt-get install -yqq --no-install-recommends libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libsqlite3-dev libgdal-dev libgeos-dev libproj-dev
 
       - name: Cache packages
         uses: actions/cache@v1
@@ -42,17 +42,10 @@ jobs:
           if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
           renv::restore()
 
-      - name: Check R Package
-        uses: r-lib/actions/check-r-package@v1
+      - name: Test
+        run: devtools::test()
+        shell: Rscript {0}
 
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
+      - name: Test coverage
+        run: covr::codecov()
+        shell: Rscript {0}

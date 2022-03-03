@@ -1,3 +1,38 @@
+.patchwork_measures <- function(plot_list) {
+  patch <- plot_list |>
+    patchwork::wrap_plots(nrow = 1)
+
+  patch + grid::textGrob(plot_list |>
+    names() |>
+    purrr::chuck(1) |>
+    stringr::word(start = 2, sep = "_") |>
+    stringr::str_to_upper()) +
+    patchwork::plot_layout(
+      widths = c(
+        rep_len(
+          10,
+          length.out = length(plot_list)),
+        4
+        )
+      )
+}
+.patchwork_all <- function(plot_list) {
+  plot_list |>
+    patchwork::wrap_plots(nrow = length(plot_list)) +
+    patchwork::plot_annotation(
+      title = plot_list |>
+        names() |>
+        purrr::chuck(1) |>
+        stringr::word(start = 1, sep = "_") |> {
+          \ (x) stringr::str_c("eumohp", x, sep = " - ")
+        }() |>
+        stringr::str_to_title(),
+      theme = ggplot2::theme(plot.title = ggplot2::element_text(
+        hjust = .5,
+        size = 12
+      ))
+    )
+}
 .plot_single_order <- function(stars_object, name, downsample = 50) {
 
   eumohp_measures <- filename_placeholders_values[
@@ -43,40 +78,52 @@
       subtitle = name |>
         stringr::word(start = 3, sep = "_") |>
         stringr::str_replace("([:alpha:]+)([1-9])", "\\1 \\2") |>
-        stringr::str_to_sentence(),
-      title = eumohp_measure |> stringr::str_to_upper()
+        stringr::str_to_sentence()
         )
 }
 
-#' Plot the clipped EUMOHP data as grid
+#' Plotting the clipped EU-MOHP data
+#'
+#' Plots the clipped EU-MOHP data as grid using ggplot2.
 #'
 #' @param .eumohp_starsproxy A list of stars proxy objects as derived
 #' from the function eumohp_clip().
 #' @param ... Additional arguments.
 #' @return ...
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' eumohp_clip(
+#'    directory_input = "directory/to/EU-MOHPfiles/",
+#'    region_name_spatcov = c("italy2"),
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' ) |>
+#' eumohp_plot()
+#'
+#'
+#' # If you want to plot faster, you can increase the argument downsample:
+#'
+#' eumohp_clip(
+#'    directory_input = "directory/to/EU-MOHPfiles/",
+#'    region_name_spatcov = c("italy2"),
+#'    hydrologic_order = 1:4,
+#'    abbreviation_measure = c("dsd", "lp"),
+#'    eumohp_version = "v013.1.1"
+#' ) |>
+#' eumohp_plot(downsample = 200)
+#' }
 #' @export
 eumohp_plot <- function(.eumohp_starsproxy, ...) {
-  test <- FALSE
-  if (test) {
-    .eumohp_starsproxy <- .eumohp_starsproxy
-  }
 
-  .eumohp_starsproxy |>
-    purrr::imap(.plot_single_order, ...) |>
-    patchwork::wrap_plots(nrow = 3) +
-    patchwork::plot_annotation(
-      title = .eumohp_starsproxy |>
-        names() |>
-        purrr::chuck(1) |>
-        stringr::word(start = 1, sep = "_") |> {
-          \ (x) stringr::str_c("eumohp", x, sep = " - ")
-        }() |>
-        stringr::str_to_title(),
-      theme = ggplot2::theme(plot.title = ggplot2::element_text(
-        hjust = .5,
-        size = 12
-      ))
-    )
+  eumohp_measures <- filename_placeholders_values[
+    names(filename_placeholders_values) == "abbreviation_measure"]
+
+  single_plots <- .eumohp_starsproxy |>
+    purrr::imap(.plot_single_order, ...)
+
+  single_plots |>
+    split(f = str_remove(names(single_plots), "hydrologicorder\\d_")) |>
+    map(.patchwork_measures) |>
+    .patchwork_all()
 }

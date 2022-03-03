@@ -4,4 +4,5 @@
 #'
 #' @format A character vector of length 39.
 #' @source \url{https://www.eea.europa.eu/countries-and-regions}
+#' @export
 "eea39_countries"
