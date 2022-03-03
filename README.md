@@ -7,13 +7,16 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![](https://img.shields.io/badge/devel%20version-0.0.0.9000-blue.svg)](https://github.com/MxNl/eumohpclipr)
 [![R-CMD-check](https://github.com/MxNl/eumohpclipr/workflows/R-CMD-check/badge.svg)](https://github.com/MxNl/eumohpclipr/actions)
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![](https://img.shields.io/github/last-commit/MxNl/eumohpclipr.svg)](https://github.com/MxNl/eumohpclipr/commits/main)
 [![License: MIT + file
 LICENSE](https://img.shields.io/badge/license-MIT%20+%20file%20LICENSE-blue.svg)](https://cran.r-project.org/web/licenses/MIT%20+%20file%20LICENSE)
 [![codecov](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg?token=YddhMy5Edd)](https://codecov.io/gh/MxNl/eumohpclipr)
+<!-- [![Dependencies](https://tinyverse.netlify.com/badge/eumohpclipr)](https://cran.r-project.org/package=eumohpclipr) -->
 <!-- badges: end -->
 
 The goal of eumohpclipr is to provide users of the EU-MOHP data set with
@@ -22,7 +25,7 @@ the functionality to
 1.  **eumohp_clip()**: Clip the raster .tif files to their custom area
     of interest and define a required subset of the data.
 2.  **eumohp_plot()**: Plot the clipped and subsetted data relatively
-    fast though using stars proxy objects.
+    fast through using stars proxy objects.
 3.  **eumohp_write()**: To write the clipped and subsetted data to disc
     as .tif files. This helps to reduce file sizes to the required
     spatial extent.

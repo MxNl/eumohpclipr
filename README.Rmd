@@ -19,16 +19,19 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+`r badger::badge_devel("MxNl/eumohpclipr", "blue")`
 [![R-CMD-check](https://github.com/MxNl/eumohpclipr/workflows/R-CMD-check/badge.svg)](https://github.com/MxNl/eumohpclipr/actions)
 `r badger::badge_repostatus("Active")`
+`r badger::badge_last_commit("MxNl/eumohpclipr")`
 `r badger::badge_license("MIT + file LICENSE")`
 [![codecov](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg?token=YddhMy5Edd)](https://codecov.io/gh/MxNl/eumohpclipr)
+<!-- `r badger::badge_dependencies()` -->
 <!-- badges: end -->
 
 The goal of eumohpclipr is to provide users of the EU-MOHP data set with the functionality to 
 
  1. **eumohp_clip()**: Clip the raster .tif files to their custom area of interest and define a required subset of the data.
- 2. **eumohp_plot()**: Plot the clipped and subsetted data relatively fast though using stars proxy objects.
+ 2. **eumohp_plot()**: Plot the clipped and subsetted data relatively fast through using stars proxy objects.
  3. **eumohp_write()**: To write the clipped and subsetted data to disc as .tif files. This helps to reduce file sizes to the required spatial extent.
 
 The EU-MOHP data set is meant as temporally static and spatially contiguous environmental predictors for the application of predominantly machine learning models for hydrologic and hydrogeological modelling / mapping tasks. It can be used along with other environmental predictors, such as land use and land cover data, soil maps, geological maps, digital elevation models, etc.
