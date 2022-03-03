@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/MxNl/eumohpclipr/workflows/R-CMD-check/badge.svg)](https://github.com/MxNl/eumohpclipr/actions)
 `r badger::badge_repostatus("Active")`
 `r badger::badge_license("MIT + file LICENSE")`
-[![Codecov test coverage](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/MxNl/eumohpclipr?branch=main)
+[![codecov](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg?token=YddhMy5Edd)](https://codecov.io/gh/MxNl/eumohpclipr)
 <!-- badges: end -->
 
 The goal of eumohpclipr is to provide users of the EU-MOHP data set with the functionality to 
@@ -120,7 +120,7 @@ Here, the argument `buffer` can not be applied as we are already using the maxim
 You can plot the clipped and subsetted data with `eumohp_plot()`.
 ```{r, fig.width=12, fig.height=10}
 eumohp_clipped_countries |> 
-  eumohp_plot(downsample = 200)
+  eumohp_plot(downsample = 50)
 ```
 You don't have to provide the `downsample` argument, as it has a default value. But if your area of interest is quite large, a higher value for this argument reduces the time to plot.
 

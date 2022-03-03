@@ -13,8 +13,7 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License: MIT + file
 LICENSE](https://img.shields.io/badge/license-MIT%20+%20file%20LICENSE-blue.svg)](https://cran.r-project.org/web/licenses/MIT%20+%20file%20LICENSE)
-[![Codecov test
-coverage](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/MxNl/eumohpclipr?branch=main)
+[![codecov](https://codecov.io/gh/MxNl/eumohpclipr/branch/main/graph/badge.svg?token=YddhMy5Edd)](https://codecov.io/gh/MxNl/eumohpclipr)
 <!-- badges: end -->
 
 The goal of eumohpclipr is to provide users of the EU-MOHP data set with
@@ -147,15 +146,15 @@ You can plot the clipped and subsetted data with `eumohp_plot()`.
 
 ``` r
 eumohp_clipped_countries |> 
-  eumohp_plot(downsample = 200)
-#> Warning: Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
-#> Removed 10204 rows containing missing values (geom_raster).
+  eumohp_plot(downsample = 50)
+#> Warning: Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
+#> Removed 157332 rows containing missing values (geom_raster).
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" /> You
