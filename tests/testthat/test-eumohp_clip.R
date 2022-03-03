@@ -172,7 +172,7 @@ Please check if your provided value\\(s\\) is/are one of:
 test_that("Length of value", {
   expect_length(
     eumohp_clip(
-      directory_input = system.file(".", package = "eumohpclipr"),
+      directory_input = testthat::test_path("fixtures"),
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ),
@@ -182,7 +182,8 @@ test_that("Length of value", {
 
 test_that("Class of value", {
   expect_equal(
-    eumohp_clip(system.file(".", package = "eumohpclipr"),
+    eumohp_clip(
+      directory_input = testthat::test_path("fixtures"),
       region_name_spatcov = "france",
       eumohp_version = "v013.1.1"
     ) |>

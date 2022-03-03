@@ -2,12 +2,19 @@
   patch <- plot_list |>
     patchwork::wrap_plots(nrow = 1)
 
-  patch+grid::textGrob(plot_list |>
-                         names() |>
-                         purrr::chuck(1) |>
-                         stringr::word(start = 2, sep = "_") |>
-                         stringr::str_to_upper()) +
-    patchwork::plot_layout(widths = c(rep_len(10, length.out = length(plot_list)), 4))
+  patch + grid::textGrob(plot_list |>
+    names() |>
+    purrr::chuck(1) |>
+    stringr::word(start = 2, sep = "_") |>
+    stringr::str_to_upper()) +
+    patchwork::plot_layout(
+      widths = c(
+        rep_len(
+          10,
+          length.out = length(plot_list)),
+        4
+        )
+      )
 }
 .patchwork_all <- function(plot_list) {
   plot_list |>
@@ -114,8 +121,6 @@ eumohp_plot <- function(.eumohp_starsproxy, ...) {
 
   single_plots <- .eumohp_starsproxy |>
     purrr::imap(.plot_single_order, ...)
-
-  fullnames <- single_plots |> names()
 
   single_plots |>
     split(f = str_remove(names(single_plots), "hydrologicorder\\d_")) |>
