@@ -10,3 +10,14 @@
 ^README\.Rmd$
 ^codecov\.yml$
 ^eumohpclipr_logo.svg$
+^inst/playground\.R$
+^inst/write_eumohp_germany\.R$
+^inst/write_maps_for_poster\.R$
+^europe_oultine\.dbf$
+^europe_oultine\.prj$
+^europe_oultine\.shp$
+^europe_oultine\.shx$
+^sardegna_polygon\.dbf$
+^sardegna_polygon\.prj$
+^sardegna_polygon\.shp$
+^sardegna_polygon\.shx$

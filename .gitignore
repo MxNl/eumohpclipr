@@ -43,3 +43,9 @@ vignettes/*.pdf
 
 # Git
 .githooks
+
+*.png
+
+europe_oultine.*
+sardegna_polygon.*
+
